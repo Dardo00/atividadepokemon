@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Pokédex</title>
+  <link rel="stylesheet" href="pokedex.css" />
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      background-color: #f44336;
+      color: #fff;
+    }
+    #lista {
+      width: 200px;
+      background-color: #d32f2f;
+      padding: 20px;
+    }
+    #lista ul {
+      list-style: none;
+      padding: 0;
+    }
+    #lista li {
+      cursor: pointer;
+      margin: 10px 0;
+      padding: 5px;
+      background: #b71c1c;
+      border-radius: 4px;
+      text-align: center;
+      transition: background 0.2s;
+    }
+    #lista li:hover {
+      background: #ef5350;
+    }
+    #detalhes {
+      flex: 1;
+      padding: 20px;
+    }
+    #pokemonImage {
+      width: 200px;
+      height: 200px;
+      object-fit: contain;
+      background: #fff;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="lista">
+    <h3>Pokémons</h3>
+    <ul id="pokemonList">
+      <!-- Nomes inseridos pelo JS -->
+    </ul>
+  </div>
+
+  <div id="detalhes">
+    <h2 id="nomePokemon">Selecione um Pokémon</h2>
+    <img id="pokemonImage" src="" alt="Imagem do Pokémon" />
+    <p><strong>Tipo:</strong> <span id="tipoPokemon"></span></p>
+    <p><strong>Habilidades:</strong> <span id="habilidadesPokemon"></span></p>
+    <p><strong>Altura:</strong> <span id="alturaPokemon"></span> m</p>
+    <p><strong>Peso:</strong> <span id="pesoPokemon"></span> kg</p>
+    <p><strong>Próxima Evolução:</strong> <span id="evolucaoPokemon"></span></p>
+  </div>
+
+  <script>
+    fetch('/api/pokemons')
+      .then(res => res.json())
+      .then(data => {
+        const lista = document.getElementById('pokemonList');
+        data.forEach((pokemon, index) => {
+          const li = document.createElement('li');
+          li.textContent = pokemon.nome;
+          li.addEventListener('click', () => mostrarPokemon(pokemon));
+          lista.appendChild(li);
+        });
+      });
+
+    function mostrarPokemon(pokemon) {
+      document.getElementById('nomePokemon').textContent = pokemon.nome;
+      document.getElementById('tipoPokemon').textContent = pokemon.tipo.join(', ');
+      document.getElementById('habilidadesPokemon').textContent = pokemon.habilidades.join(', ');
+      document.getElementById('alturaPokemon').textContent = pokemon.altura;
+      document.getElementById('pesoPokemon').textContent = pokemon.peso;
+      document.getElementById('evolucaoPokemon').textContent = pokemon.proxima_evolucao || 'Nenhuma';
+      document.getElementById('pokemonImage').src = pokemon.imagem;
+    }
+  </script>
+</body>
+</html>

@@ -1,25 +1,35 @@
 const express = require('express');
 const app = express();
-const fs = require('fs');
 const path = require('path');
+const fs = require('fs');
 
-const PORT = 3000;
+app.use(express.static('public'));
 
-// Middleware para servir arquivos estáticos (HTML, CSS, JS)
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Rota para retornar os dados dos pokémons
+// Rota que retorna todos os pokémons
 app.get('/api/pokemons', (req, res) => {
-  fs.readFile(path.join(__dirname, 'pokemons.json'), 'utf8', (err, data) => {
-    if (err) {
-      res.status(500).send('Erro ao ler o arquivo JSON.');
-    } else {
-      res.send(JSON.parse(data));
-    }
+  fs.readFile(path.join(__dirname, 'public/data/pokemons.json'), 'utf8', (err, data) => {
+    if (err) return res.status(500).send('Erro ao ler o arquivo');
+    res.json(JSON.parse(data));
   });
 });
 
-// Iniciando o servidor
-app.listen(PORT, () => {
-  console.log(`Servidor rodando em http://localhost:${PORT}`);
+// Rota que retorna um pokémon por ID
+app.get('/api/pokemon/:id', (req, res) => {
+  fs.readFile(path.join(__dirname, 'public/data/pokemons.json'), 'utf8', (err, data) => {
+    if (err) return res.status(500).send('Erro ao ler o arquivo');
+    const pokemons = JSON.parse(data);
+    const pokemon = pokemons.find(p => p.imagem.includes(`/${req.params.id}.png`));
+    if (!pokemon) return res.status(404).send('Pokémon não encontrado');
+    res.json({
+      id: req.params.id,
+      nome: pokemon.nome,
+      habilidades: pokemon.habilidades,
+      evolucao: pokemon.proxima_evolucao
+    });
+  });
+});
+
+const port = 3000;
+app.listen(port, () => {
+  console.log(`Servidor rodando em http://localhost:${port}`);
 });
